@@ -7,7 +7,14 @@ public class Filosofo implements Runnable{
 	
 	public void run() {
 		// TODO ciclo de vida do filosofo
-		System.out.println("Ola eu sou a thread"+Integer.toString(id));
+		
+		// ao obter o garfo imprime o id
+		System.out.println("O filosofo "+Integer.toString(id)+" comecou a comer");
+	
+		// ****COME****
+
+		// ao devolver o garfo imprime o id
+		System.out.println("O filosofo "+Integer.toString(id)+" terminou de comer");
 	}
 
 	public int getId() {

@@ -1,7 +1,14 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+
 public class Ep3 {
 	static int r;
 	static char criterio;
-	
+	static FileReader arquivo;
+	static BufferedReader arq;
+	static int pesos[];
+	 
 	public static void main(String[] args) {
 		parserEntrada(args);
 		
@@ -17,17 +24,40 @@ public class Ep3 {
 			System.out.println("file := arquivo texto como especificado no enunciado");
 			System.out.println("R := quantidade de porcoes comidas");
 			System.out.println("U|P := situacao uniforme ou com peso");
-		// exit(-1);
+			System.exit(-1);
 		}
 		else{
-			// TODO ler arquivo
-//			arq = fopen(argv[1], "r");
+			try { 
+				arquivo = new FileReader(args[1]); 
+				arq = new BufferedReader(arquivo);
+				
+				leituraPesos(arq);
+				
+				arq.close();
+				
+			} catch (IOException e) { 
+				System.err.printf("Erro na abertura do arquivo: %s.\n", e.getMessage());
+				System.exit(-2);
+			}
+
 			r = Integer.parseInt(args[2]);
 			criterio = args[3].charAt(0);
-			
-//			System.out.println("File = ");
-			System.out.println("r = ");
-			System.out.println("Criterio = ");		
 		}
 	}
+
+	static void leituraPesos(BufferedReader arq) throws IOException{
+		int N = Integer.parseInt(arq.readLine());
+		String linha;
+		String[] temp = new String[10];
+		pesos = new int[N];
+		
+		linha = arq.readLine();
+		temp = linha.split(" ");
+		
+		for(int i = 0; i < N; i++){
+			pesos[i] = Integer.parseInt(temp[i]);
+		}
+	}
+
+
 }
