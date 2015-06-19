@@ -1,22 +1,40 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
-public class Ep3 {
-	static int r;
+public class Ep3 {	
+	static int R;
 	static char criterio;
 	static FileReader arquivo;
 	static BufferedReader arq;
 	static int pesos[];
-	 
+	static int N; 
+	static long inicio;
+	static Monitor monitor;
+	static ArrayList<Integer> fimDasContas;
+	
 	public static void main(String[] args) {
-		parserEntrada(args);
+		inicio = System.currentTimeMillis();
 		
-		for(int i = 0; i < 5; i++){
+		parserEntrada(args);
+		fimDasContas = new ArrayList<Integer>(N);
+		monitor = new Monitor(N);
+		
+		for(int i = 0; i < N; i++){
 			Runnable s = new Filosofo(i);
 			new Thread(s).start();
 		}
+		
+		for(int i = 0; i < N; i++){
+			System.out.println("O filoso "+ i +" comeu "+ fimDasContas.get(i) + "porcoes.");
+		}		
 	}
+	
+	public static void imprimeInstanteTempo() {
+	 	long fim = System.currentTimeMillis();
+	 	System.out.println("no instante: "+ Long.toString(fim-inicio) +" ms");
+	 }
 	
 	public static void parserEntrada(String[] args){
 		if(args.length != 4){
@@ -40,13 +58,13 @@ public class Ep3 {
 				System.exit(-2);
 			}
 
-			r = Integer.parseInt(args[2]);
+			R = Integer.parseInt(args[2]);
 			criterio = args[3].charAt(0);
 		}
 	}
 
 	static void leituraPesos(BufferedReader arq) throws IOException{
-		int N = Integer.parseInt(arq.readLine());
+		N = Integer.parseInt(arq.readLine());
 		String linha;
 		String[] temp = new String[10];
 		pesos = new int[N];
@@ -58,6 +76,5 @@ public class Ep3 {
 			pesos[i] = Integer.parseInt(temp[i]);
 		}
 	}
-
 
 }
