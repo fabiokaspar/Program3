@@ -41,26 +41,46 @@ public class Monitor {
         }
 	}
 	
-	public void comePorcao(){
+	public void imprimeMensagem(String msg){
 		lock.lock();
 		
 		try {
-			Ep3.R--;
+			System.out.println(msg);
 		} finally {
             lock.unlock();
         }
 	}
 	
+	public boolean comePorcao(){
+		lock.lock();
+		boolean comeu = false;
+		
+		try {
+			if(Ep3.R > 0){
+				Ep3.R--;
+				comeu = true;
+			}
+		} finally {
+            lock.unlock();
+        }
+		
+		return comeu;
+	}
+	
 	private void wait(Condition cv){
+		lock.lock();
 		try {
 			cv.await();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		lock.unlock();
 	}
 	
 	private void signal(Condition cv){
+		lock.lock();
 		cv.signal();
+		lock.unlock();
 	} 
 }

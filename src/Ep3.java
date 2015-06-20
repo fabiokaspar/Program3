@@ -12,33 +12,63 @@ public class Ep3 {
 	static int N; 
 	static long inicio;
 	static Monitor monitor;
-	static ArrayList<Integer> fimDasContas;
+	static int fimDasContas[];
 	
 	public static void main(String[] args) {
 		inicio = System.currentTimeMillis();
-		
 		parserEntrada(args);
-		fimDasContas = new ArrayList<Integer>(N);
+		
+		System.out.println("N = "+ N + "\n");
+		
+		if(N <= 2){
+			System.out.println("Restrição: N deve ser > 2");
+			System.exit(0);
+		}
+		
+		Thread threadFilosofo[] = new Thread[N];
+		
+		inicializaEstruturas();
+		
+		// cria e inicia as threads
+		for(int i = 0; i < N; i++){
+			Runnable s = new Filosofo(i);
+			threadFilosofo[i] = new Thread(s); 
+			threadFilosofo[i].start();
+		}
+		
+		// espera terminar todas threads
+		for(int i = 0; i < N; i++){
+			try {
+				threadFilosofo[i].join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		System.out.println("\nNo fim das contas...\n");
+		
+		for(int i = 0; i < N; i++){
+			System.out.println("O filosofo "+ i +" comeu "+ fimDasContas[i] + " porções");
+		}
+	}
+	
+	public static void inicializaEstruturas(){ 
+		fimDasContas = new int[N];
 		monitor = new Monitor(N);
 		
 		for(int i = 0; i < N; i++){
-			Runnable s = new Filosofo(i);
-			new Thread(s).start();
+			fimDasContas[i] = 0; 
 		}
-		
-		for(int i = 0; i < N; i++){
-			System.out.println("O filoso "+ i +" comeu "+ fimDasContas.get(i) + "porcoes.");
-		}		
 	}
 	
-	public static void imprimeInstanteTempo() {
+	public static String tempoCorrente() {
 	 	long fim = System.currentTimeMillis();
-	 	System.out.println("no instante: "+ Long.toString(fim-inicio) +" ms");
+	 	return Long.toString(fim-inicio) +"ms";
 	 }
 	
 	public static void parserEntrada(String[] args){
-		if(args.length != 4){
-			System.out.println("Formato esperado: ./ep3 <file> <R> <U|P>");
+		if(args.length < 3){
+			System.out.println("Formato esperado: java Ep3 <file> <R> <U|P>");
 			System.out.println("file := arquivo texto como especificado no enunciado");
 			System.out.println("R := quantidade de porcoes comidas");
 			System.out.println("U|P := situacao uniforme ou com peso");
@@ -46,7 +76,11 @@ public class Ep3 {
 		}
 		else{
 			try { 
-				arquivo = new FileReader(args[1]); 
+				System.out.println("arg[0]:arquivo = "+ args[0]);
+				System.out.println("arg[1]:R =  "+ args[1]);
+				System.out.println("arg[2]:modo = "+ args[2]);
+				
+				arquivo = new FileReader(args[0]); 
 				arq = new BufferedReader(arquivo);
 				
 				leituraPesos(arq);
@@ -58,13 +92,13 @@ public class Ep3 {
 				System.exit(-2);
 			}
 
-			R = Integer.parseInt(args[2]);
-			criterio = args[3].charAt(0);
+			R = Integer.parseInt(args[1]);
+			criterio = args[2].charAt(0);
 		}
 	}
 
 	static void leituraPesos(BufferedReader arq) throws IOException{
-		N = Integer.parseInt(arq.readLine());
+		N = Integer.parseInt(arq.readLine());	
 		String linha;
 		String[] temp = new String[10];
 		pesos = new int[N];
@@ -74,6 +108,10 @@ public class Ep3 {
 		
 		for(int i = 0; i < N; i++){
 			pesos[i] = Integer.parseInt(temp[i]);
+			if(pesos[i] <= 1){
+				System.out.println("Restrição: pesos devem ser > 1");
+				System.exit(0);
+			}
 		}
 	}
 
