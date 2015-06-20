@@ -12,13 +12,8 @@ public class Filosofo extends Thread{
 	public void run(){
 		while(Ep3.R > 0){
 			pensa();
-			
 			tentaComer();
-			
-			//imprimeInfoInicio();
 			come();
-			//imprimeInfoFim();
-			
 		 	devolveGarfos();
 		}
 		
