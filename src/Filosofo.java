@@ -3,18 +3,24 @@ import java.util.Random;
 public class Filosofo extends Thread{
 	private int id;
 	private int qtoComeu;
+	private int cota;
 	
-	Filosofo(int id){
+	Filosofo(int id, int cotaPermitida){
 		this.id = id;
 		qtoComeu = 0;
+		this.cota = cotaPermitida;
 	}
 	
-	public void run(){
+	public void run(){		
 		while(Ep3.R > 0){
 			pensa();
-			tentaComer();
-			come();
-		 	devolveGarfos();
+			
+			if(qtoComeu < cota || Ep3.R <= Ep3.resto)
+			{
+				tentaComer();
+				come();
+			 	devolveGarfos();
+			}
 		}
 		
 		Ep3.fimDasContas[id] = qtoComeu;
@@ -42,7 +48,7 @@ public class Filosofo extends Thread{
 		}
 	}
 	
-	public void come() {
+	public void come(){
 	 	try {
 	 	    if(Ep3.monitor.comePorcao()){			
 	 	    	imprimeInfoInicio();
@@ -53,9 +59,9 @@ public class Filosofo extends Thread{
 	 	} catch (InterruptedException e) {
 	 		e.printStackTrace();
 	 	}
-	 }
+	}
 	
-	public void pensa() {
+	public void pensa(){
 	 	Random ger = new Random();
 	 	long tempoPensando = ger.nextInt(4000);  // tempo maximo eh 4000 ms
 	 	 
@@ -66,7 +72,9 @@ public class Filosofo extends Thread{
 	 	} catch (InterruptedException e) {
 	 		e.printStackTrace();
 	 	}
-	 }
+	}
+	
+	
 	
 	public void imprimeInfoInicio(){
 		// IMPRIME ID DO FILOSOFO + INSTANTE QUE COMEÇAM AS GARFADAS (INICIO)

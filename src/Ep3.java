@@ -4,42 +4,51 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class Ep3 {	
-	static int R;
-	static char criterio;
-	static FileReader arquivo;
-	static BufferedReader arq;
-	static int pesos[];
-	static int N; 
-	static long inicio;
-	static Monitor monitor;
-	static int fimDasContas[];
+	static int R; 						// esse R eh variavel
+	static int Rin; 					// R inicial
+	static int N;						// # de filosofos
+	static char criterio;				// U ou P
+	static long inicio;					// tempo (em ms)
+	static Monitor monitor;				// monitor das threads
+	static int fimDasContas[];			// quanto cada um comeu	
+	static int pesos[];					// caso P
+	static int somaPesos;				// caso P
+	static int resto;					// resto da comida que será disputada 
 	
 	public static void main(String[] args) {
 		inicio = System.currentTimeMillis();
 		parserEntrada(args);
 		
+		System.out.println("arg[0]:arquivo = "+ args[0]);
+		System.out.println("arg[1]:R = "+ R);
+		System.out.println("arg[2]:modo = "+ criterio); 
 		System.out.println("N = "+ N + "\n");
-		
-		if(N <= 2){
-			System.out.println("Restrição: N deve ser > 2");
-			System.exit(0);
-		}
 		
 		Thread threadFilosofo[] = new Thread[N];
 		
-		inicializaEstruturas();
-		
 		// cria e inicia as threads
-		for(int i = 0; i < N; i++){
-			Runnable s = new Filosofo(i);
-			threadFilosofo[i] = new Thread(s); 
-			threadFilosofo[i].start();
+		if(criterio == 'U'){
+			int cotaUnif = cotaFilosofoCriterioU();
+			 
+			for(int id = 0; id < N; id++){
+				Runnable s = new Filosofo(id, cotaUnif);
+				threadFilosofo[id] = new Thread(s); 
+				threadFilosofo[id].start();
+			}
+		}
+		
+		else{ // caso P
+			for(int id = 0; id < N; id++){
+				Runnable s = new Filosofo(id, cotaFilosofoCriterioP(id));
+				threadFilosofo[id] = new Thread(s); 
+				threadFilosofo[id].start();
+			}
 		}
 		
 		// espera terminar todas threads
-		for(int i = 0; i < N; i++){
+		for(int id = 0; id < N; id++){
 			try {
-				threadFilosofo[i].join();
+				threadFilosofo[id].join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -52,16 +61,17 @@ public class Ep3 {
 		}
 	}
 	
-	public static void inicializaEstruturas(){ 
+	public static void inicializaEstruturas(){
 		fimDasContas = new int[N];
 		monitor = new Monitor(N);
 		
-		for(int i = 0; i < N; i++){
-			fimDasContas[i] = 0; 
+		if(criterio == 'P'){
+			pesos = new int[N];
 		}
 	}
 	
-	public static String tempoCorrente() {
+	// tempo atual em String
+	public static String tempoCorrente(){
 	 	long fim = System.currentTimeMillis();
 	 	return Long.toString(fim-inicio) +"ms";
 	 }
@@ -75,44 +85,90 @@ public class Ep3 {
 			System.exit(-1);
 		}
 		else{
-			try { 
-				System.out.println("arg[0]:arquivo = "+ args[0]);
-				System.out.println("arg[1]:R =  "+ args[1]);
-				System.out.println("arg[2]:modo = "+ args[2]);
+			try{
+				FileReader arquivo = new FileReader(args[0]);
+				R = Integer.parseInt(args[1]);
+				Rin = R;
+				criterio = args[2].charAt(0);
 				
-				arquivo = new FileReader(args[0]); 
-				arq = new BufferedReader(arquivo);
+				if(criterio != 'U' && criterio != 'P'){
+					System.out.println("Critérios permitidos: U e P somente");
+					System.exit(0);
+				}
 				
-				leituraPesos(arq);
+				BufferedReader arq = new BufferedReader(arquivo);
+				
+				N = Integer.parseInt(arq.readLine());
+				
+				if(N <= 2){
+					System.out.println("Restrição: N deve ser > 2");
+					System.exit(0);
+				}
+				
+				inicializaEstruturas();
+					
+				if(criterio == 'P'){
+					leituraPesos(arq);
+					resto = (Rin % somaPesos);
+				}
+				
+				else{
+					resto = (Rin % N);
+				}
 				
 				arq.close();
 				
-			} catch (IOException e) { 
+			} catch (IOException e) {
 				System.err.printf("Erro na abertura do arquivo: %s.\n", e.getMessage());
 				System.exit(-2);
 			}
-
-			R = Integer.parseInt(args[1]);
-			criterio = args[2].charAt(0);
 		}
 	}
-
-	static void leituraPesos(BufferedReader arq) throws IOException{
-		N = Integer.parseInt(arq.readLine());	
-		String linha;
-		String[] temp = new String[10];
-		pesos = new int[N];
+	
+	// seta pesos (caso P) e seta a somatoria dos mesmos
+	public static void leituraPesos(BufferedReader arq){
+		String linha = null;
+		String[] temp = new String[N];
+		somaPesos = 0;
 		
-		linha = arq.readLine();
+		try {
+			linha = arq.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		temp = linha.split(" ");
 		
 		for(int i = 0; i < N; i++){
 			pesos[i] = Integer.parseInt(temp[i]);
+			
 			if(pesos[i] <= 1){
 				System.out.println("Restrição: pesos devem ser > 1");
 				System.exit(0);
 			}
+			
+			somaPesos += pesos[i];
+		}	
+	}
+
+	public static int cotaFilosofoCriterioU(){
+		int cota = 0;
+		
+		if(N > 0){
+			cota = (Rin/N);
 		}
+		
+		return cota;
+	}
+	
+	public static int cotaFilosofoCriterioP(int id){
+		int cota = 0;
+		
+		if(somaPesos > 0){
+			cota = (pesos[id] * Rin)/somaPesos;   
+		}
+		
+		return cota;
 	}
 
 }
