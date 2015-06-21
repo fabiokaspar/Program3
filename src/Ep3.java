@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class Ep3 {	
 	static int R; 						// esse R eh variavel
@@ -161,7 +160,7 @@ public class Ep3 {
 		resto = (Rin % N);
 	}
 	
-
+	
 	public static int cotaFilosofoCriterioU(){
 		int cota = 0;
 		
