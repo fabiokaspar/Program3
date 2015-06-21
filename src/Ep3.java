@@ -28,6 +28,7 @@ public class Ep3 {
 		
 		// cria e inicia as threads
 		if(criterio == 'U'){
+			calculaRestoCriterioU();
 			int cotaUnif = cotaFilosofoCriterioU();
 			 
 			for(int id = 0; id < N; id++){
@@ -38,6 +39,8 @@ public class Ep3 {
 		}
 		
 		else{ // caso P
+			calculaRestoCriterioP();
+			
 			for(int id = 0; id < N; id++){
 				Runnable s = new Filosofo(id, cotaFilosofoCriterioP(id));
 				threadFilosofo[id] = new Thread(s); 
@@ -109,11 +112,6 @@ public class Ep3 {
 					
 				if(criterio == 'P'){
 					leituraPesos(arq);
-					resto = (Rin % somaPesos);
-				}
-				
-				else{
-					resto = (Rin % N);
 				}
 				
 				arq.close();
@@ -150,6 +148,19 @@ public class Ep3 {
 			somaPesos += pesos[i];
 		}	
 	}
+	
+	public static void calculaRestoCriterioP(){
+		resto = Rin;
+				
+		for(int i = 0; i < N; i++){
+			resto -= ((pesos[i]*Rin)/somaPesos);
+		}
+	}
+	
+	public static void calculaRestoCriterioU(){
+		resto = (Rin % N);
+	}
+	
 
 	public static int cotaFilosofoCriterioU(){
 		int cota = 0;
