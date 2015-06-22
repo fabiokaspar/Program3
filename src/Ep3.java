@@ -5,13 +5,13 @@ import java.io.IOException;
 public class Ep3 {	
 	static int R; 						// esse R eh variavel
 	static int Rin; 					// R inicial
-	static int N;						// # de filosofos
+	static int N;						
 	static char criterio;				// U ou P
-	static long inicio;					// tempo (em ms)
+	static long inicio;					// tempo inicial (em ms)
 	static Monitor monitor;				// monitor das threads
 	static int fimDasContas[];			// quanto cada um comeu	
-	static int pesos[];					// caso P
-	static int somaPesos;				// caso P
+	static int pesos[];					// no caso P
+	static int somaPesos;				// no caso P
 	static int resto;					// resto da comida que será disputada 
 	
 	public static void main(String[] args) {
@@ -25,7 +25,7 @@ public class Ep3 {
 		
 		Thread threadFilosofo[] = new Thread[N];
 		
-		// cria e inicia as threads
+		// cria e inicia as threads no caso U ou P
 		if(criterio == 'U'){
 			calculaRestoCriterioU();
 			int cotaUnif = cotaFilosofoCriterioU();
@@ -37,7 +37,7 @@ public class Ep3 {
 			}
 		}
 		
-		else{ // caso P
+		else{ 
 			calculaRestoCriterioP();
 			
 			for(int id = 0; id < N; id++){
@@ -78,6 +78,7 @@ public class Ep3 {
 	 	return Long.toString(fim-inicio) +"ms";
 	 }
 	
+	// "parseia" e valida a entrada, carregando algumas variaveis
 	public static void parserEntrada(String[] args){
 		if(args.length < 3){
 			System.out.println("Formato esperado: java Ep3 <file> <R> <U|P>");
@@ -122,7 +123,7 @@ public class Ep3 {
 		}
 	}
 	
-	// seta pesos (caso P) e seta a somatoria dos mesmos
+	// seta pesos (no caso P) e a somatoria dos mesmos
 	public static void leituraPesos(BufferedReader arq){
 		String linha = null;
 		String[] temp = new String[N];
@@ -148,6 +149,7 @@ public class Ep3 {
 		}	
 	}
 	
+	// resto das porções usando divisão euclidiana, caso P
 	public static void calculaRestoCriterioP(){
 		resto = Rin;
 				
@@ -156,11 +158,12 @@ public class Ep3 {
 		}
 	}
 	
+	// idem caso U
 	public static void calculaRestoCriterioU(){
 		resto = (Rin % N);
 	}
 	
-	
+	// cota maxima de porções, caso U
 	public static int cotaFilosofoCriterioU(){
 		int cota = 0;
 		
@@ -171,6 +174,7 @@ public class Ep3 {
 		return cota;
 	}
 	
+	// idem caso P
 	public static int cotaFilosofoCriterioP(int id){
 		int cota = 0;
 		

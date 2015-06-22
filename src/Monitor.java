@@ -4,13 +4,14 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Monitor {
 	private boolean garfoEmUso[];
-	private final Lock lock = new ReentrantLock();
+	private final Lock lock;
 	private Condition fork[];
 	
 	// inicializacao recebe numero de filosofos
 	Monitor(int N){
 		fork = new Condition[N];
 		garfoEmUso = new boolean[N];
+		lock = new ReentrantLock();
 		
 		for(int i = 0; i < N; i++){
 			fork[i] = lock.newCondition();
